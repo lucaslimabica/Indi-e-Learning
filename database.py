@@ -127,7 +127,7 @@ def get_user(id=None, username: str=None):
             return user_json
     except AttributeError as e:
         # The object has no attribute 'id' or 'username'
-        return json.dumps({"Sucess": "False", "Error Type": "Object hasnt a solicited attribute", "Data": {"error": str(e)}})
+        return json.dumps({"Sucess": "False", "Error Type": "Object hasnt a solicited attribute or maybe it doest exist", "Data": {"error": str(e)}}, indent=4)
     finally:
         session.close()
 print(get_user(7))
