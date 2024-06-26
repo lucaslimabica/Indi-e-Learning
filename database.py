@@ -105,6 +105,29 @@ def get_users():
     
     users_json = json.dumps(users_dict, indent=4)
     return users_json
-    # session.query(User).filter(User.id == id).update({"username": username})
 
-print(get_users())
+def get_user(id=None, username: str=None):
+    try:
+        if id or username:
+            Session = sessionmaker(bind=engine)
+            session = Session()
+
+            if id:
+                user = session.query(User).filter(User.id == id).first()
+            else:
+                user = session.query(User).filter(User.username == username).first()
+            user_dict = {
+                "id": user.id,
+                "username": user.username,
+                "password": user.password,
+                "creation_date": user.creation_date.isoformat()
+            }
+
+            user_json = json.dumps(user_dict, indent=4)
+            return user_json
+    except AttributeError as e:
+        # The object has no attribute 'id' or 'username'
+        return json.dumps({"Sucess": "False", "Error Type": "Object hasnt a solicited attribute", "Data": {"error": str(e)}})
+    finally:
+        session.close()
+print(get_user(7))
