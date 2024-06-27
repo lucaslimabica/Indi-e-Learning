@@ -6,6 +6,45 @@ import json
 
 Base = declarative_base()  # Returns a base class to define declarative classes (tables)
 
+class Professor(Base):
+    __tablename__ = 'professors'
+
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    name = Column("name", String, nullable=False)
+    creation_date = Column("creation_date", DateTime, default=datetime.now)
+    courses_list = Column("courses_list", String, nullable=True)
+    user_id = Column("user_id", ForeignKey('users.id'), nullable=False)
+    user_login = Column("user_login", nullable=False)
+    user_password = Column("user_password", nullable=False)
+    user = relationship("User", back_populates="professors")
+
+    def __init__(self, name, user, courses_list=None):
+        self.name = name
+        self.user = user
+        self.user_login = user.id
+        self.user_password = user.password
+        self.courses_list = json.dumps(courses_list) if courses_list else json.dumps([]) # -> JSON of the list
+
+    def __repr__(self):
+        return f"<Professor(id={self.id}, username='{self.name}', creation_date='{self.creation_date}', list_of_courses='{self.courses_list}')>"
+
+class Course(Base):
+    __tablename__ = 'courses'
+
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    name = Column("name", String, nullable=False)
+    description = Column("description", String, nullable=True)
+    creation_date = Column("creation_date", DateTime, default=datetime.now)
+    subscribers = Column("subscribers", Integer, default=0)
+    professor_id = Column(Integer, ForeignKey('professors.id'), nullable=True)
+    professor = relationship("Professor", back_populates="courses_list")
+
+    def __init__(self, name, description=None, professor=None):
+        self.name = name
+        self.description = description
+        self.professor = professor
+        self.subscribers = 0
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -62,18 +101,15 @@ if not session.query(User).filter_by(username='admin').first():
 # for user in users_list:
 #     print(user)
 
-# Create and add a document for the first user in the list
 # if users_list:
 #     drivers_license = Document("Drivers License", users_list[0])
 #     session.add(drivers_license)
 #     session.commit()
 
-# Uncomment the following lines to filter users with insecure passwords
 # not_secured_users = session.query(User).filter(User.password == '87654321').all()
 # for user in not_secured_users:  # User's type = class User
 #     print(f"{user.username} hasn't a secure password.")
 
-# Uncomment the following lines to add a new user
 # new_user = User("suporte", "87654321")  # Create a new user
 # session.add(new_user)  # Add the new user to the session
 # session.commit()  # Commit the changes to the database
@@ -130,4 +166,3 @@ def get_user(id=None, username: str=None):
         return json.dumps({"Sucess": "False", "Error Type": "Object hasnt a solicited attribute or maybe it doest exist", "Data": {"error": str(e)}}, indent=4)
     finally:
         session.close()
-print(get_user(7))
