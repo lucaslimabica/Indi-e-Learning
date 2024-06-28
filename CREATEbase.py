@@ -21,7 +21,7 @@ class User(Base):
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', password='{self.password}', creation_date='{self.creation_date}')>"
 
-    def get_json(self):
+    def get_json(self) -> str:
         return json.dumps({
             'id': self.id,
             'username': self.username,
@@ -44,16 +44,16 @@ class Professor(Base):
     user = relationship("User", back_populates="professors")
     courses = relationship("Course", back_populates="professor")
 
-    def __init__(self, name, user, courses_list=None, area="Technical Engineering"):
+    def __init__(self, name, user, courses_list="[]", area="Technical Engineering"):
         self.name = name
         self.user = user  # The User Object
         self.area = area
-        self.courses_list = json.dumps(courses_list, indent=2) if courses_list else json.dumps([])  # -> JSON of the list
+        self.courses_list = courses_list if courses_list else "[]"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Professor(id={self.id}, username='{self.name}', creation_date='{self.creation_date}', list_of_courses='{self.courses_list}')>"
 
-    def get_json(self):
+    def get_json(self) -> str:
         return json.dumps({
             'id': self.id,
             'name': self.name,
@@ -63,12 +63,14 @@ class Professor(Base):
             'user_id': self.user_id
         }, indent=2)
 
-    def get_courses_json(self):
-        return self.courses_list
+    def get_courses_json(self) -> str:
+        return json.dumps(self.courses_list, indent=4)
 
-    def get_courses(self):
-        return json.loads(self.courses_list)  # Convert JSON back to list
-
+    def get_courses(self) -> list:
+        try:
+            return self.courses_list.split()
+        except AttributeError as e:
+            return [""]
 
 class Course(Base):
     __tablename__ = 'courses'
@@ -88,8 +90,6 @@ class Course(Base):
         self.description = description
         self.professor = professor  # The Professor Object
         self.subscribers = 0
-
-        self.professor.courses_list.append(self.name)
     
     def get_json(self):
         return json.dumps({
@@ -109,3 +109,28 @@ Base.metadata.create_all(bind=engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+############### EXEMPLES #################
+
+user1 = session.query(User).filter_by(username="benObiw").first()
+# session.commit()
+
+professor1 = session.query(Professor).filter_by(name="Master Kenobi").first()
+# session.add(professor1)
+# session.commit()
+# 
+# course1 = Course(name="Rules 101", professor=professor1, description="Learn how to follow the rules")
+# course2 = Course(name="Negotiation", professor=professor1, description="The Best Confflict is the Confflict You Don't Fight")
+# session.add_all([course1, course2])
+# session.commit()
+# 
+courses = session.query(Course).all()
+courses_names = [course.name for course in courses]
+
+for course in courses_names:
+    professor1.courses_list = professor1.get_courses().append(course)
+    session.commit()
+
+print(session.query(User).all())
+print(session.query(Professor).all())
+print(session.query(Course).all())
