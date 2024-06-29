@@ -19,7 +19,7 @@ class User(Base):
 
     # Method to check info about the user (like the __str__ method)
     def __repr__(self):
-        return f"<User(id={self.id}, username='{self.username}', password='{self.password}', creation_date='{self.creation_date}')>"
+        return f"(id={self.id}, username={self.username}, password={self.password}, creation_data={self.creation_date})"
 
     def get_json(self) -> str:
         return json.dumps({
@@ -69,7 +69,7 @@ class Professor(Base):
     def get_courses(self) -> list:
         try:
             return self.courses_list.split()
-        except AttributeError as e:
+        except AttributeError:
             return [""]
 
 class Course(Base):
@@ -110,12 +110,16 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+def get_all_users():
+    return session.query(User).all()
+
+
 ############### EXEMPLES #################
 
-user1 = session.query(User).filter_by(username="benObiw").first()
+# user1 = session.query(User).filter_by(username="benObiw").first()
 # session.commit()
 
-professor1 = session.query(Professor).filter_by(name="Master Kenobi").first()
+# professor1 = session.query(Professor).filter_by(name="Master Kenobi").first()
 # session.add(professor1)
 # session.commit()
 # 
@@ -124,13 +128,13 @@ professor1 = session.query(Professor).filter_by(name="Master Kenobi").first()
 # session.add_all([course1, course2])
 # session.commit()
 # 
-courses = session.query(Course).all()
-courses_names = [course.name for course in courses]
+# courses = session.query(Course).all()
+# courses_names = [course.name for course in courses]
+# 
+# for course in courses_names:
+#     professor1.courses_list = professor1.get_courses().append(course)
+#     session.commit()
 
-for course in courses_names:
-    professor1.courses_list = professor1.get_courses().append(course)
-    session.commit()
-
-print(session.query(User).all())
-print(session.query(Professor).all())
-print(session.query(Course).all())
+# print(session.query(User).all())
+# print(session.query(Professor).all())
+# print(session.query(Course).all())
