@@ -46,11 +46,13 @@ def get_users():
 @app.route('/users', methods=['POST'])
 def create_users():
     json = request.get_json()
-    sucess, data = CRUDbaseL.create_user(json)
-    if sucess:
-        return 201, jsonify(STR_SUCESS + data)
-    else:
-        return jsonify(STR_ERROR + data)
+    if validate_json(json, ["username", "password"]):
+        sucess, data = CRUDbaseL.create_user(json)
+        if sucess:
+            return 201, jsonify(STR_SUCESS + data)
+        else:
+            return jsonify(STR_ERROR + data)
+    return 400, jsonify(f"{STR_ERROR} Invalide JSON String")
 
 @app.route('/users/<int:id>', methods=['GET'])
 def get_userById(id):

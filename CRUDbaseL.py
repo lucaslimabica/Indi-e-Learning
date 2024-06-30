@@ -42,7 +42,10 @@ def create_user(userjson: dict):
     password = userjson["password"]
     try:
         # Inserir usuário na tabela users
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        cursor.execute("INSERT INTO users (username, password) VALUES (:username, :password)",
+                       {"username": userjson["username"],
+                        "password": userjson["password"]
+                       })
         conn.commit()
 
         # Selecionar o usuário recém-criado
@@ -105,10 +108,7 @@ def create_course(coursejson: dict):
     except sqlite3.OperationalError as e:
         return False, f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
     
-create_course({
-    "name": "The Light Saber 101 Basics Vol.3",
-    "description": "How to use a basic light saber", 
-    "subscriptions": 2,
-    "value": 8100,
-    "professor_id": 1 
+create_user({
+    "username": "aniPadmelover",
+    "password": "ihatesand@" 
 })
