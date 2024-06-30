@@ -12,10 +12,12 @@ def get_users() -> list[tuple]:
     try:
         cursor.execute("SELECT * FROM users")
         users = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        if users == "None":
+            return False, "Error: Users Table is Empty"
     except sqlite3.OperationalError:
         return False, f"Error: This Table my be not exist, Complete Error: {sqlite3.OperationalError}"
-    conn.commit()
-    conn.close()
     return True, f"{users}"
 
 def get_user(id: int, username: str=None) -> tuple:
@@ -28,7 +30,12 @@ def get_user(id: int, username: str=None) -> tuple:
         user = cursor.fetchone()
         conn.commit()
         conn.close()
+        if user == "None":
+            return False, "Error: ID or Username did not exist"
         return True, f"{user}"
     except sqlite3.OperationalError:
-        return False, f"Error: ID or Username may be invalid, Complete Error: {sqlite3.OperationalError}"
+        return False, f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
+
+value, data = get_user(2)
+print(data, type(data))
