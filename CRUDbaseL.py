@@ -36,6 +36,20 @@ def get_user(id: int, username: str=None) -> tuple:
     except sqlite3.OperationalError:
         return False, f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
+def create_user(userjson: dict):
+    conn, cursor = get_connection(DATABASE)
+    username = userjson["username"]
+    password = userjson["password"]
+    try:
+        # Inserir usuário na tabela users
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        conn.commit()
 
-value, data = get_user(2)
-print(data, type(data))
+        # Selecionar o usuário recém-criado
+        cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+        user = cursor.fetchone()
+
+        conn.close()
+        return True, user
+    except sqlite3.OperationalError as e:
+        return False, f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"

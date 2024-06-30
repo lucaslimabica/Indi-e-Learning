@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import CRUDbaseL
 
 
@@ -30,26 +30,34 @@ def get_courseByUsername(username):
 def get_users():
     sucess, data = CRUDbaseL.get_users()
     if sucess:
-        return jsonify(STR_SUCESS + data)
+        return 200, jsonify(STR_SUCESS + data)
     else:
         return jsonify(STR_ERROR + data)
-
+    
+@app.route('/users', methods=['POST'])
+def create_users():
+    json = request.get_json()
+    sucess, data = CRUDbaseL.create_user(json)
+    if sucess:
+        return 201, jsonify(STR_SUCESS + data)
+    else:
+        return jsonify(STR_ERROR + data)
 
 @app.route('/users/<int:id>', methods=['GET'])
 def get_userById(id):
     sucess, data = CRUDbaseL.get_user(id=id)
     if sucess:
-        return jsonify(STR_SUCESS + data)
+        return 200, jsonify(f"{STR_SUCESS} {data}")
     else:
-        return jsonify(STR_ERROR + data)
+        return jsonify(f"{STR_ERROR} {data}")
 
 @app.route('/users/<username>', methods=['GET'])
 def get_userByUsername(username):
     sucess, data = CRUDbaseL.get_user(username=username)
     if sucess:
-        return jsonify(STR_SUCESS + data)
+        return 200, jsonify(f"{STR_SUCESS} {data}")
     else:
-        return jsonify(STR_ERROR + data)
+        return jsonify(f"{STR_ERROR} {data}")
 
 if __name__ == '__main__':
     app.run(port=443)
