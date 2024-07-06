@@ -84,24 +84,43 @@ def get_user(id: int, username: str=None) -> tuple:
     except sqlite3.OperationalError:
         return f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
-def create_user(userjson: dict):
+def create_user(userjson: dict) -> tuple:
+    """
+    Create a new user in the 'users' table and retrieve the newly created user.
+
+    ### Parameters
+    - userjson (dict): A dictionary containing 'username' and 'password' keys with corresponding values.
+
+    ### Return
+    - tuple: The newly created user as a tuple (id, username, password).
+    - str: Error message if an error occurs.
+
+    ### Example
+    userjson = {"username": "new_user", "password": "password123"}
+    create_user(userjson)
+    >>> (3, 'new_user', 'password123')
+
+    ### Error Handling
+    If there is an operational error (e.g., the database is not available), an error message is returned.
+    """
+
     conn, cursor = get_connection(DATABASE)
     username = userjson["username"]
     password = userjson["password"]
     try:
-        # Inserir usuário na tabela users
         cursor.execute("INSERT INTO users (username, password) VALUES (:username, :password)",
                        {"username": userjson["username"],
                         "password": userjson["password"]
                        })
         conn.commit()
 
-        # Selecionar o usuário recém-criado
         cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
         user = cursor.fetchone()
 
         conn.close()
         return user
+    except AttributeError:
+        return "Check your dict"
     except sqlite3.OperationalError as e:
         return f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
 
