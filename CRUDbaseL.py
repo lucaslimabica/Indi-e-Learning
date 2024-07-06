@@ -9,14 +9,23 @@ def get_connection(DATABASE):
 
 def get_users() -> list[tuple]:
     """
-    RETURN a list of tuples of 
-    all users from table 'users'
+    Retrieve all users from the 'users' table.
 
     ### Return
-    [(id, username, password),]
-    
+    A list of tuples, where each tuple contains:
+    (id, username, password)
+
+    ### Example
     get_users()
-    >>> [(1, 'admin', '123456789'), (2, 'user', '987654321'),]
+    >>> [(1, 'admin', '123456789'), (2, 'user', '987654321')]
+
+    ### Error Handling
+    If the users table is empty, an error message is returned.
+    If there is an operational error (e.g., the table does not exist), an error message is returned.
+
+    ### Returns
+    - list of tuples: Each tuple contains user data (id, username, password).
+    - str: Error message if an error occurs.
     """
     conn, cursor = get_connection(DATABASE)
     try:
@@ -24,13 +33,40 @@ def get_users() -> list[tuple]:
         users = cursor.fetchall()
         conn.commit()
         conn.close()
-        if users == "None":
+        if not users:
             return "Error: Users Table is Empty"
-    except sqlite3.OperationalError:
-        return "Error: This Table my be not exist, Complete Error: {sqlite3.OperationalError}"
+    except sqlite3.OperationalError as e:
+        return f"Error: This table may not exist, Complete Error: {e}"
     return users
 
+
 def get_user(id: int, username: str=None) -> tuple:
+    """
+    Retrieve the first user's tuple from the 'users' table.
+
+    ### Return
+    A tuple whose contains:
+    (id, username, password)
+
+    ### Example
+    get_user(1)
+    >>> (1, 'admin', '123456789')
+
+    get_user('user')
+    >>> (2, 'user', '987654321')
+
+    user = get_user(1)
+    print(user[2])
+    >>> '123456789'
+
+    ### Error Handling
+    If the users table is empty, an error message is returned.
+    If there is an operational error (e.g., the table does not exist), an error message is returned.
+
+    ### Returns
+    - tuples: Tuple contains user data (id, username, password).
+    - str: Error message if an error occurs.
+    """
     conn, cursor = get_connection(DATABASE)
     try:
         if id:
@@ -43,6 +79,8 @@ def get_user(id: int, username: str=None) -> tuple:
         if user == "None":
             return "Error: ID or Username did not exist"
         return user
+    except AttributeError:
+        return "Please check your parameters"
     except sqlite3.OperationalError:
         return f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
