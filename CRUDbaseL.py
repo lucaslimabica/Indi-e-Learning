@@ -8,6 +8,16 @@ def get_connection(DATABASE):
     return conn, cursor
 
 def get_users() -> list[tuple]:
+    """
+    RETURN a list of tuples of 
+    all users from table 'users'
+
+    ### Return
+    [(id, username, password),]
+    
+    get_users()
+    >>> [(1, 'admin', '123456789'), (2, 'user', '987654321'),]
+    """
     conn, cursor = get_connection(DATABASE)
     try:
         cursor.execute("SELECT * FROM users")
@@ -15,10 +25,10 @@ def get_users() -> list[tuple]:
         conn.commit()
         conn.close()
         if users == "None":
-            return False, "Error: Users Table is Empty"
+            return "Error: Users Table is Empty"
     except sqlite3.OperationalError:
-        return False, f"Error: This Table my be not exist, Complete Error: {sqlite3.OperationalError}"
-    return True, f"{users}"
+        return "Error: This Table my be not exist, Complete Error: {sqlite3.OperationalError}"
+    return users
 
 def get_user(id: int, username: str=None) -> tuple:
     conn, cursor = get_connection(DATABASE)
@@ -31,10 +41,10 @@ def get_user(id: int, username: str=None) -> tuple:
         conn.commit()
         conn.close()
         if user == "None":
-            return False, "Error: ID or Username did not exist"
-        return True, f"{user}"
+            return "Error: ID or Username did not exist"
+        return user
     except sqlite3.OperationalError:
-        return False, f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
+        return f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
 def create_user(userjson: dict):
     conn, cursor = get_connection(DATABASE)
@@ -53,9 +63,9 @@ def create_user(userjson: dict):
         user = cursor.fetchone()
 
         conn.close()
-        return True, user
+        return user
     except sqlite3.OperationalError as e:
-        return False, f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
+        return f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
 
 def get_courses() -> list[tuple]:
     conn, cursor = get_connection(DATABASE)
@@ -65,10 +75,10 @@ def get_courses() -> list[tuple]:
         conn.commit()
         conn.close()
         if courses == "None":
-            return False, "Error: Courses Table is Empty"
+            return "Error: Courses Table is Empty"
     except sqlite3.OperationalError:
         return False, f"Error: This Table my be not exist, Complete Error: {sqlite3.OperationalError}"
-    return True, f"{courses}"
+    return courses
 
 def get_course(id: int, name: str=None) -> tuple:
     conn, cursor = get_connection(DATABASE)
@@ -81,10 +91,10 @@ def get_course(id: int, name: str=None) -> tuple:
         conn.commit()
         conn.close()
         if course == "None":
-            return False, "Error: ID or Name did not exist"
-        return True, f"{course}"
+            return "Error: ID or Name did not exist"
+        return course
     except sqlite3.OperationalError:
-        return False, f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
+        return f"Error: Maybe the Database isnt avaliable, Complete Error: {sqlite3.OperationalError}"
 
 def create_course(coursejson: dict):
     conn, cursor = get_connection(DATABASE)
@@ -104,11 +114,11 @@ def create_course(coursejson: dict):
         user = cursor.fetchone()
 
         conn.close()
-        return True, user
+        return user
     except sqlite3.OperationalError as e:
-        return False, f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
+        return f"Error: Maybe the Database isn't available, Complete Error: {str(e)}"
     
-create_user({
-    "username": "aniPadmelover",
-    "password": "ihatesand@" 
-})
+print(f"Getter Unique (username for example): {get_user(1)[1]}")
+print(f"General Getter: {get_users()}")
+print(f"Course Getter Unique: {get_courses()}")
+print(f"Getting Course ID: {get_course(2)}")
