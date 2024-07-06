@@ -37,12 +37,14 @@ def home():
 
 @app.route('/users', methods=['GET'])
 def get_users():
-    sucess, data = CRUDbaseL.get_users()
-    if sucess:
-        return 200, jsonify(STR_SUCESS + data)
-    else:
-        return jsonify(STR_ERROR + data)
+    data = CRUDbaseL.get_users()
     
+    if isinstance(data, str) and data.startswith("Error"):
+        return jsonify({"error": data}), 500
+    
+    return jsonify({"Sucess": "True", "Data": data}), 200
+
+
 @app.route('/users', methods=['POST'])
 def create_users():
     json = request.get_json()
