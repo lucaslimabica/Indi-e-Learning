@@ -40,7 +40,7 @@ def get_users() -> list[tuple]:
         conn.close()
     return users
 
-def get_user(id: int = None, username: str = None) -> tuple or str:
+def get_user(id: int = None, username: str = None) -> tuple:
     """
     Retrieve a user from the 'users' table by ID or username.
 
@@ -82,7 +82,7 @@ def get_user(id: int = None, username: str = None) -> tuple or str:
         conn.close()
     return user
 
-def create_user(userjson: dict) -> tuple or str:
+def create_user(userjson: dict) -> tuple:
     """
     Create a new user in the 'users' table and retrieve the newly created user.
 
@@ -151,7 +151,7 @@ def get_courses() -> list[tuple]:
         conn.close()
     return courses
 
-def get_course(id: int = None, name: str = None) -> tuple or str:
+def get_course(id: int = None, name: str = None) -> tuple:
     """
     Retrieve a course from the 'courses' table by ID or name.
 
@@ -193,7 +193,7 @@ def get_course(id: int = None, name: str = None) -> tuple or str:
         conn.close()
     return course
 
-def create_course(coursejson: dict) -> tuple or str:
+def create_course(coursejson: dict) -> tuple:
     """
     Create a new course in the 'courses' table and retrieve the newly created course.
 
